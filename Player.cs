@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 
 namespace FangamePhysicsSimulator
 {
-    internal class Player
+    internal class GM8Player
     {
         [Flags]
         public enum Input
@@ -29,39 +28,43 @@ namespace FangamePhysicsSimulator
             set { _Ceiling = value - 12; }
         }
 
-        public bool Released;
+        // make singlejump specific to frame 1 (of search)?
+        public bool Released, SingleJump, DoubleJump;
         public double Y, VSpeed;
         public int Frame;
-        List<Input> Inputs;
+        readonly List<Input> Inputs;
 
-        public Player(double Y, double VSpeed)
+        public GM8Player(double Y, double VSpeed)
         {
             Released = false;
             this.Y = Y;
             this.VSpeed = VSpeed;
             Frame = 0;
             Inputs = new();
+            SingleJump = true;
+            DoubleJump = true;
         }
 
         // copy constructor
-        public Player(Player p)
+        public GM8Player(GM8Player p)
         {
             Released = p.Released;
             Y = p.Y;
             VSpeed = p.VSpeed;
             Frame = p.Frame;
             Inputs = new(p.Inputs);
+            SingleJump = p.SingleJump;
+            DoubleJump = p.DoubleJump;
         }
 
         public void Advance(bool Press, bool Release)
         {
             UpdateVSpeed(Press, Release);
 
-            // collision
+            Collision();
 
-            UpdatePosition();
-
-            // ...
+            // update position
+            Y += VSpeed;
         }
 
         void UpdateVSpeed(bool Press, bool Release)
@@ -78,15 +81,36 @@ namespace FangamePhysicsSimulator
             Input input = 0;
 
             // force release if there was none when reaching positive vspeed
+            // intention is to force release on fulljump once done
+            // !! might require && !Press
             if (!Released && VSpeed > 0)
             {
+                if (Release && !Press)
+                {
+                    // temporary
+                    throw new Exception("cannot release on positive vspeed");
+                }
                 Release = true;
                 Released = true;
             }
 
             if (Press)
             {
-                VSpeed = -SINGLEJUMP;
+                if (SingleJump)
+                {
+                    VSpeed = -SINGLEJUMP;
+                    SingleJump = false;
+                }
+                else if (DoubleJump)
+                {
+                    VSpeed = -DOUBLEJUMP;
+                    DoubleJump = false;
+                }
+                else
+                {
+                    // temporary
+                    throw new Exception("no multiple doublejumps");
+                }
                 input = Input.Press;
                 Released = false;
             }
@@ -106,16 +130,56 @@ namespace FangamePhysicsSimulator
                 VSpeed = MAXVSPEED;
         }
 
-        void UpdatePosition()
+        // collision checks against floor and ceiling during movement
+        void Collision()
         {
-            Y += VSpeed;
+            double RoundedPosition = Math.Round(Y);
+            if (VSpeed > 0)
+            {
+                // above ground, moving downwards
+                if (RoundedPosition < _Floor)
+                {
+                    // next intended position in or below ground
+                    if (Math.Round(Y + VSpeed) >= _Floor)
+                    {
+                        double NextPosition = Y + 1;
+                        // rerounding for vfpi behaviour
+                        while (Math.Round(NextPosition) < _Floor)
+                        {
+                            Y++;
+                            NextPosition++;
+                        }
+
+                        VSpeed = 0;
+                    }
+                }
+            }
+            else
+            {
+                // underneath ceiling, moving upwards
+                if (RoundedPosition > _Ceiling)
+                {
+                    // next intended position in or above ceiling
+                    if (Math.Round(Y + VSpeed) <= _Ceiling)
+                    {
+                        double NextPosition = Y - 1;
+                        // rerounding for vfpi behaviour
+                        while (Math.Round(NextPosition) > _Ceiling)
+                        {
+                            Y--;
+                            NextPosition--;
+                        }
+
+                        VSpeed = 0;
+                    }
+                }
+            }
         }
 
-        [Pure]
-        string GetStrat()
+        public string GetStrat(bool OneFrameConvention)
         {
             StringBuilder sb = new();
-            int Frames = 0;
+            int Frames = 0, Convention = OneFrameConvention ? 1 : 0;
             bool Held = false;
 
             for (int i = 0; i < Inputs.Count; i++)
@@ -130,11 +194,11 @@ namespace FangamePhysicsSimulator
                     {
                         if (Held)
                         {
-                            sb.Append($"{Frames}f 0p ");
+                            sb.Append($"{Frames + Convention}f 0p ");
                         }
                         else
                         {
-                            sb.Append($"{Frames}p ");
+                            sb.Append($" {Frames}p ");
                         }
                     }
 
@@ -145,11 +209,11 @@ namespace FangamePhysicsSimulator
                 {
                     if (Held)
                     {
-                        sb.Append($"{Frames}f ");
+                        sb.Append($"{Frames + Convention}f");
                     }
                     else
                     {
-                        sb.Append($"+{Frames} ");
+                        sb.Append($"+{Frames}");
                     }
 
                     Held = false;
@@ -159,11 +223,11 @@ namespace FangamePhysicsSimulator
                 Frames++;
             }
 
-            Frames--;
+            //Frames--;
 
             if (Held)
             {
-                sb.Append($"{Frames}f ");
+                sb.Append($"{Frames + Convention}f");
             }
             else if (Frames > 0)
             {
