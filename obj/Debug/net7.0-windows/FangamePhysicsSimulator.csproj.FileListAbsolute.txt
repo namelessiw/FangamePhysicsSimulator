@@ -1,0 +1,17 @@
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\bin\Debug\net7.0-windows\FangamePhysicsSimulator.exe
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\bin\Debug\net7.0-windows\FangamePhysicsSimulator.deps.json
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\bin\Debug\net7.0-windows\FangamePhysicsSimulator.runtimeconfig.json
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\bin\Debug\net7.0-windows\FangamePhysicsSimulator.dll
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\bin\Debug\net7.0-windows\FangamePhysicsSimulator.pdb
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.csproj.AssemblyReference.cache
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.Form1.resources
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.csproj.GenerateResource.cache
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.AssemblyInfoInputs.cache
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.AssemblyInfo.cs
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.csproj.CoreCompileInputs.cache
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.dll
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\refint\FangamePhysicsSimulator.dll
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.pdb
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\FangamePhysicsSimulator.genruntimeconfig.cache
+C:\Users\ziaal\source\repos\FangamePhysicsSimulator\obj\Debug\net7.0-windows\ref\FangamePhysicsSimulator.dll
