@@ -6,6 +6,8 @@ namespace FangamePhysicsSimulator
 {
     internal class GM8Player
     {
+        #region declarations
+
         [Flags]
         public enum Input
         {
@@ -57,6 +59,8 @@ namespace FangamePhysicsSimulator
             DoubleJump = p.DoubleJump;
         }
 
+        #endregion
+
         public void Advance(bool Press, bool Release)
         {
             UpdateVSpeed(Press, Release);
@@ -68,6 +72,8 @@ namespace FangamePhysicsSimulator
 
             Frame++;
         }
+
+        #region physics
 
         void UpdateVSpeed(bool Press, bool Release)
         {
@@ -215,10 +221,13 @@ namespace FangamePhysicsSimulator
             VSpeed = 0;
         }
 
+        #endregion physics
+
         public string GetStrat(bool OneFrameConvention)
         {
             StringBuilder sb = new();
-            int Frames = 0, Convention = OneFrameConvention ? 1 : 0;
+            int Frames = 0, 
+                Convention = OneFrameConvention ? 1 : 0;
             bool Held = false;
 
             for (int i = 0; i < Inputs.Count; i++)
@@ -230,30 +239,14 @@ namespace FangamePhysicsSimulator
                 if (Press)
                 {
                     if (Frames > 0)
-                    {
-                        if (Held)
-                        {
-                            sb.Append($"{Frames + Convention}f 0p ");
-                        }
-                        else
-                        {
-                            sb.Append($" {Frames}p ");
-                        }
-                    }
+                        sb.Append(Held ? $"{Frames + Convention}f 0p " : $" {Frames}p ");
 
                     Held = true;
                     Frames = 0;
                 }
                 if (Release)
                 {
-                    if (Held)
-                    {
-                        sb.Append($"{Frames + Convention}f");
-                    }
-                    else
-                    {
-                        sb.Append($"+{Frames}");
-                    }
+                    sb.Append(Held ? $"{Frames + Convention}f" : $"+{Frames}");
 
                     Held = false;
                     Frames = 0;
@@ -262,14 +255,7 @@ namespace FangamePhysicsSimulator
                 Frames++;
             }
 
-            if (Held)
-            {
-                sb.Append($"{Frames + Convention}f");
-            }
-            else if (Frames > 0)
-            {
-                sb.Append($" {Frames}p");
-            }
+            sb.Append(Held ? $"{Frames + Convention}f" : $" {Frames}p");
 
             return sb.ToString().Trim();
         }
