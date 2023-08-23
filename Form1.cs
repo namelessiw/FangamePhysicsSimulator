@@ -13,58 +13,18 @@ namespace FangamePhysicsSimulator
             GM8Player.Floor = 416;
             GM8Player.Ceiling = double.MinValue;
 
-            (bool, bool)[] Inputs = new (bool, bool)[]
-            {
-                (true, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, true),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (true, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, true),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-                (false, false),
-            };
+            Random r = new();
 
-            foreach ((bool Press, bool Release) in Inputs)
+            do
             {
+                bool Press = test.Frame == 0 || test.DoubleJump && r.Next(16) < 1;
+                bool Release = test.VSpeed < 0 && r.Next(32) < 1;
+
                 test.Advance(Press, Release);
-
-                MessageBox.Show($"Y: {test.Y}\nVSpeed: {test.VSpeed}\nInputs: {test.GetStrat(false)}\n");
             }
+            while (test.VSpeed != 0);
+
+            MessageBox.Show($"Y: {test.Y}\nVSpeed: {test.VSpeed}\nInputs: {test.GetStrat(false)}\n");
         }
     }
 }
