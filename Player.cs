@@ -16,7 +16,13 @@ namespace FangamePhysicsSimulator
         }
 
         // physics constants
-        public static double GRAVITY = 0.4, RELEASE_MULTIPLIER = 0.45, SINGLEJUMP = 8.5, DOUBLEJUMP = 7, MAXVSPEED = 9;
+        public static double GRAVITY = 0.4, 
+            RELEASE_MULTIPLIER = 0.45, 
+            SINGLEJUMP = 8.5, 
+            DOUBLEJUMP = 7, 
+            MAXVSPEED = 9;
+        public static bool FLOOR_KILLER = false,
+            CEILING_KILLER = false;
 
         static double _Floor;
         public static double Floor
@@ -68,7 +74,10 @@ namespace FangamePhysicsSimulator
 
         #region physics
 
-        public static void GetLowerBound()
+        // set lower bound based on goal height and physics
+        // lowest height from which the goal is still reachable with a single doublejump
+        // !! requires recalculating before each search unless goal and physics unchanged
+        public static void SetLowerBound()
         {
             GM8Player p = new(0, 0)
             {
@@ -82,16 +91,22 @@ namespace FangamePhysicsSimulator
             LowerBound = Goal - p.Y;
         }
 
-        public void Advance(bool Press, bool Release)
+        // returns if player is alive after advancing a frame with given inputs
+        // !! create a duplicate function for singlejumps specifically?
+        public bool Advance(bool Press, bool Release)
         {
             UpdateVSpeed(Press, Release);
 
-            Collision_2();
+            if (!Collision_2())
+            {
+                return false;
+            }
 
             // update position
             Y += VSpeed;
 
             Frame++;
+            return true;
         }
 
         void UpdateVSpeed(bool Press, bool Release)
@@ -203,8 +218,9 @@ namespace FangamePhysicsSimulator
             }
         }
 
-        // assumes floor > ceiling
-        void Collision_2()
+        // !! assumes floor > ceiling
+        // returns whether player survives
+        bool Collision_2()
         {
             double NextPosition = Math.Round(Y + VSpeed);
             bool WillBeAboveFloor = NextPosition < _Floor;
@@ -214,6 +230,8 @@ namespace FangamePhysicsSimulator
                 bool AboveFloor = Math.Round(Y) < _Floor;
                 if (AboveFloor)
                 {
+                    if (FLOOR_KILLER)
+                        return false;
                     PerformCollision(1, _Floor);
                 }
             }
@@ -222,9 +240,12 @@ namespace FangamePhysicsSimulator
                 bool BelowCeiling = Math.Round(Y) > _Ceiling;
                 if (BelowCeiling)
                 {
+                    if (CEILING_KILLER)
+                        return false;
                     PerformCollision(-1, _Ceiling);
                 }
             }
+            return Y <= LowerBound && VSpeed >= 0;
         }
 
         void PerformCollision(int Sign, double Solid)
