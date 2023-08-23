@@ -30,6 +30,11 @@ namespace FangamePhysicsSimulator
             set { _Ceiling = value - 12; }
         }
 
+        // cannot reach the goal with a doublejump when below this point
+        static double LowerBound;
+
+        public static double Goal;
+
         // make singlejump specific to frame 1 (of search)?
         public bool Released, SingleJump, DoubleJump;
         public double Y, VSpeed;
@@ -61,6 +66,22 @@ namespace FangamePhysicsSimulator
 
         #endregion
 
+        #region physics
+
+        public static void GetLowerBound()
+        {
+            GM8Player p = new(0, 0)
+            {
+                SingleJump = false
+            };
+            p.Advance(true, false);
+            while (p.VSpeed < -GRAVITY)
+            {
+                p.Advance(false, false);
+            }
+            LowerBound = Goal - p.Y;
+        }
+
         public void Advance(bool Press, bool Release)
         {
             UpdateVSpeed(Press, Release);
@@ -72,8 +93,6 @@ namespace FangamePhysicsSimulator
 
             Frame++;
         }
-
-        #region physics
 
         void UpdateVSpeed(bool Press, bool Release)
         {
