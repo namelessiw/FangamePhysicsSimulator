@@ -61,10 +61,12 @@ namespace FangamePhysicsSimulator
         {
             UpdateVSpeed(Press, Release);
 
-            Collision();
+            Collision_2();
 
             // update position
             Y += VSpeed;
+
+            Frame++;
         }
 
         void UpdateVSpeed(bool Press, bool Release)
@@ -90,7 +92,7 @@ namespace FangamePhysicsSimulator
                     // temporary
                     throw new Exception("cannot release on positive vspeed");
                 }
-                Release = true;
+                input |= Input.Release;
                 Released = true;
             }
 
@@ -144,7 +146,7 @@ namespace FangamePhysicsSimulator
                     {
                         double NextPosition = Y + 1;
                         // rerounding for vfpi behaviour
-                        while (Math.Round(NextPosition) < _Floor)
+                        while (Math.Round(NextPosition) != _Floor)
                         {
                             Y++;
                             NextPosition++;
@@ -164,7 +166,7 @@ namespace FangamePhysicsSimulator
                     {
                         double NextPosition = Y - 1;
                         // rerounding for vfpi behaviour
-                        while (Math.Round(NextPosition) > _Ceiling)
+                        while (Math.Round(NextPosition) != _Ceiling)
                         {
                             Y--;
                             NextPosition--;
@@ -174,6 +176,43 @@ namespace FangamePhysicsSimulator
                     }
                 }
             }
+        }
+
+        // assumes floor > ceiling
+        void Collision_2()
+        {
+            double NextPosition = Math.Round(Y + VSpeed);
+            bool WillBeAboveFloor = NextPosition < _Floor;
+
+            if (!WillBeAboveFloor)
+            {
+                bool AboveFloor = Math.Round(Y) < _Floor;
+                if (AboveFloor)
+                {
+                    PerformCollision(1, _Floor);
+                }
+            }
+            else if (!(NextPosition > _Ceiling))
+            {
+                bool BelowCeiling = Math.Round(Y) > _Ceiling;
+                if (BelowCeiling)
+                {
+                    PerformCollision(-1, _Ceiling);
+                }
+            }
+        }
+
+        void PerformCollision(int Sign, double Solid)
+        {
+            double NextPosition = Y + Sign;
+            // rerounding for vfpi behaviour
+            while (Math.Round(NextPosition) != Solid)
+            {
+                Y += Sign;
+                NextPosition += Sign;
+            }
+
+            VSpeed = 0;
         }
 
         public string GetStrat(bool OneFrameConvention)
@@ -222,8 +261,6 @@ namespace FangamePhysicsSimulator
 
                 Frames++;
             }
-
-            //Frames--;
 
             if (Held)
             {
