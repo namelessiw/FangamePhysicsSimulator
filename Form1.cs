@@ -25,7 +25,7 @@ namespace FangamePhysicsSimulator
 
             Search_Test();
 
-            do
+            /*do
             {
                 bool Press = test.Frame == 0 || test.DoubleJump && r.Next(16) < 1;
                 bool Release = test.VSpeed < 0 && r.Next(4) < 1;
@@ -34,15 +34,15 @@ namespace FangamePhysicsSimulator
             }
             while (test.VSpeed != 0);
 
-            MessageBox.Show($"Y: {test.Y}\nVSpeed: {test.VSpeed}\nInputs: {test.GetStrat(false)}\n");
+            MessageBox.Show($"Y: {test.Y}\nVSpeed: {test.VSpeed}\nInputs: {test.GetStrat(false)}\n");*/
         }
 
         void Search_Test()
         {
-            GM8Player p = new(407, 0);
-            p.DoubleJump = true;
+            GM8Player p = new(407.3999999999999, 0);
             GM8Player.Ceiling = double.MinValue;
             GM8Player.Floor = 416;
+            GM8Player.FLOOR_KILLER = true;
             GM8Player.Goal = 406.5;
             GM8Player.SetLowerBound();
 

@@ -83,6 +83,7 @@ namespace FangamePhysicsSimulator
             {
                 SingleJump = false
             };
+            LowerBound = 0;
             p.Advance(true, false);
             while (p.VSpeed < -GRAVITY)
             {
@@ -245,7 +246,7 @@ namespace FangamePhysicsSimulator
                     PerformCollision(-1, _Ceiling);
                 }
             }
-            return Y <= LowerBound && VSpeed >= 0;
+            return !(Y > LowerBound && VSpeed >= 0);
         }
 
         void PerformCollision(int Sign, double Solid)
