@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace FangamePhysicsSimulator
 {
     public partial class Form1 : Form
@@ -9,14 +11,14 @@ namespace FangamePhysicsSimulator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            GM8Player test = new(407.4, 0);
+            /*GM8Player test = new(407.4, 0);
             GM8Player.Floor = 416;
             GM8Player.Ceiling = double.MinValue;
             GM8Player.Goal = 406.5;
 
             GM8Player.SetLowerBound();
 
-            Random r = new();
+            Random r = new();*/
 
             // goal
             // absolute lower bound
@@ -39,21 +41,30 @@ namespace FangamePhysicsSimulator
 
         void Search_Test()
         {
-            GM8Player p = new(407.3999999999999, 0);
+            Stopwatch sw = new();
+            sw.Start();
+
+            double start = 406.7;
+            for (int i = 0; i < 2; i++)
+            {
+                start = Math.BitIncrement(start);
+            }
+
+            GM8Player p = new(start, 0);
             GM8Player.Ceiling = double.MinValue;
             GM8Player.Floor = 416;
-            GM8Player.FLOOR_KILLER = true;
+            GM8Player.FLOOR_KILLER = false;
             GM8Player.Goal = 406.5;
             GM8Player.SetLowerBound();
 
             List<GM8Player> Results = new();
 
             GM8Player temp = new(p);
-            temp.Advance(true, false);
+            temp.AdvanceSinglejump(true);
 
             Search_Test(temp, Results);
 
-            p.Advance(true, true);
+            p.AdvanceSinglejump(false);
 
             Search_Test(p, Results);
 
@@ -61,14 +72,11 @@ namespace FangamePhysicsSimulator
             foreach (GM8Player r in Results)
             {
                 s += r.GetStrat(false) + " (" + r.Frame + ")\n";
-
-                if (r.Frame > 66)
-                {
-
-                }
             }
 
-            MessageBox.Show($"Results: {Results.Count}\n{s}");
+            sw.Stop();
+
+            MessageBox.Show($"{sw.Elapsed}\nResults: {Results.Count}\n{s}");
         }
 
         void Search_Test(GM8Player p, List<GM8Player> Results)

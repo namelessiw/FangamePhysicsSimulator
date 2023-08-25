@@ -41,20 +41,18 @@ namespace FangamePhysicsSimulator
 
         public static double Goal;
 
-        // make singlejump specific to frame 1 (of search)?
-        public bool Released, SingleJump, DoubleJump;
+        public bool Released, DoubleJump;
         public double Y, VSpeed;
         public int Frame;
         readonly List<Input> Inputs;
 
         public GM8Player(double Y, double VSpeed)
         {
-            Released = false;
+            Released = VSpeed > 0;
             this.Y = Y;
             this.VSpeed = VSpeed;
             Frame = 0;
             Inputs = new();
-            SingleJump = true;
             DoubleJump = true;
         }
 
@@ -66,7 +64,6 @@ namespace FangamePhysicsSimulator
             VSpeed = p.VSpeed;
             Frame = p.Frame;
             Inputs = new(p.Inputs);
-            SingleJump = p.SingleJump;
             DoubleJump = p.DoubleJump;
         }
 
@@ -79,10 +76,7 @@ namespace FangamePhysicsSimulator
         // !! requires recalculating before each search unless goal and physics unchanged
         public static void SetLowerBound()
         {
-            GM8Player p = new(0, 0)
-            {
-                SingleJump = false
-            };
+            GM8Player p = new(0, 0);
             LowerBound = 0;
             p.Advance(true, false);
             while (p.VSpeed < -GRAVITY)
@@ -92,12 +86,18 @@ namespace FangamePhysicsSimulator
             LowerBound = Goal - p.Y;
         }
 
+        // performs a singlejump, only meant to be called at the start of a search
         // returns if player is alive after advancing a frame with given inputs
-        // !! create a duplicate function for singlejumps specifically?
-        public bool Advance(bool Press, bool Release)
+        public bool AdvanceSinglejump(bool Release)
         {
-            UpdateVSpeed(Press, Release);
+            // update vspeed
+            ApplyInputs(Release);
 
+            CapVSpeed();
+
+            VSpeed += GRAVITY;
+
+            // collision
             if (!Collision_2())
             {
                 return false;
@@ -110,22 +110,58 @@ namespace FangamePhysicsSimulator
             return true;
         }
 
-        void UpdateVSpeed(bool Press, bool Release)
+        // singlejump variant
+        void ApplyInputs(bool Release)
         {
-            CheckInputs(Press, Release);
+            Input input = Input.Press;
+            VSpeed = -SINGLEJUMP;
+
+            if (Release)
+            {
+                VSpeed *= RELEASE_MULTIPLIER;
+                input |= Input.Release;
+                Released = true;
+            }
+            else
+            {
+                Released = false;
+            }
+
+            Inputs.Add(input);
+        }
+
+        // performs a doublejump if press is true
+        // returns if player is alive after advancing a frame with given inputs
+        public bool Advance(bool Press, bool Release)
+        {
+            // update vspeed
+            ApplyInputs(Press, Release);
 
             CapVSpeed();
 
             VSpeed += GRAVITY;
+
+            // collision
+            if (!Collision_2())
+            {
+                return false;
+            }
+
+            // update position
+            Y += VSpeed;
+
+            Frame++;
+            return true;
         }
 
-        void CheckInputs(bool Press, bool Release)
+        // doublejump variant
+        void ApplyInputs(bool Press, bool Release)
         {
             Input input = 0;
 
             // force release if there was none when reaching positive vspeed
             // intention is to force release on fulljump once done
-            // !! might require && !Press
+            // !! might require && !Press (p sure it doesnt)
             if (!Released && VSpeed > 0)
             {
                 if (Release && !Press)
@@ -139,12 +175,7 @@ namespace FangamePhysicsSimulator
 
             if (Press)
             {
-                if (SingleJump)
-                {
-                    VSpeed = -SINGLEJUMP;
-                    SingleJump = false;
-                }
-                else if (DoubleJump)
+                if (DoubleJump)
                 {
                     VSpeed = -DOUBLEJUMP;
                     DoubleJump = false;
@@ -152,7 +183,7 @@ namespace FangamePhysicsSimulator
                 else
                 {
                     // temporary
-                    throw new Exception("no multiple doublejumps");
+                    throw new Exception("no doublejumps remaining");
                 }
                 input = Input.Press;
                 Released = false;
