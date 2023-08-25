@@ -86,6 +86,12 @@ namespace FangamePhysicsSimulator
             LowerBound = Goal - p.Y;
         }
 
+        // returns whether current y position is stable
+        public bool IsStable()
+        {
+            return Math.Round(Y) < _Floor && Math.Round(Y + GRAVITY) >= _Floor && Math.Round(Y + VSpeed + GRAVITY) >= _Floor;
+        }
+
         // performs a singlejump, only meant to be called at the start of a search
         // returns if player is alive after advancing a frame with given inputs
         public bool AdvanceSinglejump(bool Release)

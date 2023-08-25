@@ -89,37 +89,40 @@ namespace FangamePhysicsSimulator
             if (p.Y == GM8Player.Goal)
             {
                 Results.Add(p);
-                return;
             }
 
-            if (p.VSpeed == 0)
+            if (p.VSpeed == 0 && p.IsStable())
                 return;
+
+            GM8Player temp;
 
             if (p.DoubleJump)
             {
-                GM8Player temp = new(p);
-                if (temp.Advance(true, false))
+                temp = new(p);
+                if (temp.Advance(true, true))
                 {
                     Search_Test(temp, Results);
                 }
 
                 temp = new(p);
-                if (temp.Advance(true, true))
+                if (temp.Advance(true, false))
                 {
                     Search_Test(temp, Results);
                 }
             }
             if (p.VSpeed < 0)
             {
-                GM8Player temp = new(p);
+                temp = new(p);
                 if (temp.Advance(false, true))
                 {
                     Search_Test(temp, Results);
                 }
             }
-            if (p.Advance(false, false))
+
+            temp = new(p);
+            if (temp.Advance(false, false))
             {
-                Search_Test(p, Results);
+                Search_Test(temp, Results);
             }
         }
     }
