@@ -48,7 +48,7 @@ namespace FangamePhysicsSimulator
 
         public GM8Player(double Y, double VSpeed)
         {
-            Released = VSpeed > 0;
+            Released = VSpeed >= 0;
             this.Y = Y;
             this.VSpeed = VSpeed;
             Frame = 0;

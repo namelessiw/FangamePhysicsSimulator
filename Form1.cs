@@ -44,8 +44,8 @@ namespace FangamePhysicsSimulator
             Stopwatch sw = new();
             sw.Start();
 
-            double start = 406.7;
-            for (int i = 0; i < 2; i++)
+            double start = 439.3;
+            for (int i = 0; i < 0; i++)
             {
                 start = Math.BitIncrement(start);
             }
@@ -60,6 +60,11 @@ namespace FangamePhysicsSimulator
             List<GM8Player> Results = new();
 
             GM8Player temp = new(p);
+            temp.Advance(false, false);
+
+            Search_Test(temp, Results);
+
+            temp = new(p);
             temp.AdvanceSinglejump(true);
 
             Search_Test(temp, Results);
