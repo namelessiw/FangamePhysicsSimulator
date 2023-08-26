@@ -33,7 +33,7 @@ namespace FangamePhysicsSimulator
         static double _Ceiling;
         public static double Ceiling
         {
-            set { _Ceiling = value - 12; }
+            set { _Ceiling = value + 12; }
         }
 
         // cannot reach the goal with a doublejump when below this point
@@ -270,7 +270,14 @@ namespace FangamePhysicsSimulator
                 {
                     if (FLOOR_KILLER)
                         return false;
-                    PerformCollision(1, _Floor);
+                    NextPosition = Y + 1;
+                    while (Math.Round(NextPosition) < _Floor)
+                    {
+                        Y++;
+                        NextPosition++;
+                    }
+
+                    VSpeed = 0;
                 }
             }
             else if (!(NextPosition > _Ceiling))
@@ -280,23 +287,17 @@ namespace FangamePhysicsSimulator
                 {
                     if (CEILING_KILLER)
                         return false;
-                    PerformCollision(-1, _Ceiling);
+                    NextPosition = Y - 1;
+                    while (Math.Round(NextPosition) > _Ceiling)
+                    {
+                        Y--;
+                        NextPosition--;
+                    }
+
+                    VSpeed = 0;
                 }
             }
             return !(Y > LowerBound && VSpeed >= 0);
-        }
-
-        void PerformCollision(int Sign, double Solid)
-        {
-            double NextPosition = Y + Sign;
-            // rerounding for vfpi behaviour
-            while (Math.Round(NextPosition) != Solid)
-            {
-                Y += Sign;
-                NextPosition += Sign;
-            }
-
-            VSpeed = 0;
         }
 
         #endregion physics

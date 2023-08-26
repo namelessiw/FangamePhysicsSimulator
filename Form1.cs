@@ -51,7 +51,8 @@ namespace FangamePhysicsSimulator
             }
 
             GM8Player p = new(start, 0);
-            GM8Player.Ceiling = double.MinValue;
+            GM8Player.Ceiling = 391;
+            GM8Player.CEILING_KILLER = false;
             GM8Player.Floor = 416;
             GM8Player.FLOOR_KILLER = false;
             GM8Player.Goal = 406.5;
