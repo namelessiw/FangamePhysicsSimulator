@@ -27,13 +27,13 @@ namespace FangamePhysicsSimulator
         static double _Floor;
         public static double Floor
         {
-            set { _Floor = value - 8; }
+            set { _Floor = Math.Round(value - 8); }
         }
 
         static double _Ceiling;
         public static double Ceiling
         {
-            set { _Ceiling = value + 12; }
+            set { _Ceiling = Math.Round(value + 12); }
         }
 
         // cannot reach the goal with a doublejump when below this point
