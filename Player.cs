@@ -24,16 +24,17 @@ namespace FangamePhysicsSimulator
         public static bool FLOOR_KILLER = false,
             CEILING_KILLER = false;
 
+        // the floor and ceiling values used remove the need for rounding the position on every check
         static double _Floor;
         public static double Floor
         {
-            set { _Floor = Math.Round(value - 8); }
+            set { _Floor = Math.Round(value) % 2 == 0 ? Math.Round(value) - 8.5 : Math.BitIncrement(Math.Round(value) - 8.5); }
         }
 
         static double _Ceiling;
         public static double Ceiling
         {
-            set { _Ceiling = Math.Round(value + 12); }
+            set { _Ceiling = Math.Round(value) % 2 == 0 ? Math.BitDecrement(Math.Round(value) + 12.5) : Math.Round(value) + 12.5; }
         }
 
         // cannot reach the goal with a doublejump when below this point
@@ -87,9 +88,12 @@ namespace FangamePhysicsSimulator
         }
 
         // returns whether current y position is stable
+        // maybe check for vspeed == 0 instead of y + vspeed + gravity >= floor?
         public bool IsStable()
         {
-            return Math.Round(Y) < _Floor && Math.Round(Y + GRAVITY) >= _Floor && Math.Round(Y + VSpeed + GRAVITY) >= _Floor;
+            return Y < _Floor && 
+                Y + GRAVITY >= _Floor && 
+                Y + VSpeed + GRAVITY >= _Floor;
         }
 
         // performs a singlejump, only meant to be called at the start of a search
@@ -260,18 +264,18 @@ namespace FangamePhysicsSimulator
         // returns whether player survives
         bool Collision_2()
         {
-            double NextPosition = Math.Round(Y + VSpeed);
+            double NextPosition = Y + VSpeed;
             bool WillBeAboveFloor = NextPosition < _Floor;
 
             if (!WillBeAboveFloor)
             {
-                bool AboveFloor = Math.Round(Y) < _Floor;
+                bool AboveFloor = Y < _Floor;
                 if (AboveFloor)
                 {
                     if (FLOOR_KILLER)
                         return false;
                     NextPosition = Y + 1;
-                    while (Math.Round(NextPosition) < _Floor)
+                    while (NextPosition < _Floor)
                     {
                         Y++;
                         NextPosition++;
@@ -282,13 +286,13 @@ namespace FangamePhysicsSimulator
             }
             else if (!(NextPosition > _Ceiling))
             {
-                bool BelowCeiling = Math.Round(Y) > _Ceiling;
+                bool BelowCeiling = Y > _Ceiling;
                 if (BelowCeiling)
                 {
                     if (CEILING_KILLER)
                         return false;
                     NextPosition = Y - 1;
-                    while (Math.Round(NextPosition) > _Ceiling)
+                    while (NextPosition > _Ceiling)
                     {
                         Y--;
                         NextPosition--;
